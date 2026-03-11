@@ -1,41 +1,51 @@
 # 🎲 3D Dice Roller
 
-A simple and interactive **3D Dice Roller web application** built using **HTML, CSS, and JavaScript**.  
-The application simulates rolling two dice with smooth animations and automatically calculates the **sum of both dice**.
+A visually rich **3D Dice Roller Web Application** built using **HTML, CSS, and JavaScript**.
+The application simulates rolling **two 3D animated dice** and calculates their **sum dynamically** with engaging UI effects.
 
-This project demonstrates front-end development concepts such as **DOM manipulation, random number generation, CSS animations, and interactive UI design**.
+The project features smooth animations, glowing neon UI, roll history tracking, confetti effects, and interactive visuals.
 
 ---
 
 ## 🚀 Demo
 
-You can run the project locally by opening the **index.html** file in your browser.
+You can view the project by opening the `index.html` file in any modern web browser.
 
-file:///D:/Training%20and%20Upskills/Rolling%20Dice/index.html
+Or deploy it easily using **GitHub Pages**.
+
 ---
 
 ## 📸 Screenshot
 
-![Dice Roller Screenshot](Dice.png)
+![Dice Roller Screenshot](screenshot.png)
+
+*(Add your project screenshot in the repository and name it `screenshot.png`)*
 
 ---
 
 ## ✨ Features
 
-- 🎲 Roll two dice with animated effects  
-- ➕ Automatically calculates the **sum of both dice**  
-- 🌌 Interactive and visually appealing **UI design**  
-- 📜 Displays **recent roll history**  
-- 💬 Shows **special messages** for specific dice totals  
-- ⚡ Smooth animations and responsive layout  
+* 🎲 **3D Dice Animation**
+* 🔢 **Automatic Sum Calculation**
+* 🎨 **Modern Neon UI Design**
+* 🌌 **Animated Background with Floating Orbs & Stars**
+* 🎉 **Confetti Burst Effect on Roll**
+* 📊 **Recent Rolls History**
+* ⚡ **Smooth CSS Animations**
+* 🔔 **Special Messages for Lucky Rolls**
+
+  * Snake Eyes (2)
+  * Lucky Seven (7)
+  * Eleven
+  * Boxcars (12)
 
 ---
 
 ## 🛠️ Technologies Used
 
-- **HTML5** – Structure of the web page  
-- **CSS3** – Styling, animations, and 3D effects  
-- **JavaScript (Vanilla JS)** – Dice logic and interactivity  
+* **HTML5** – Structure
+* **CSS3** – Styling & Animations
+* **JavaScript (Vanilla)** – Logic & Interactivity
 
 ---
 
@@ -44,18 +54,18 @@ file:///D:/Training%20and%20Upskills/Rolling%20Dice/index.html
 ```
 dice-roller/
 │
-├── index.html
-└── images
-    └── screenshot.png
+├── index.html        # Main project file
+├── screenshot.png    # Project screenshot
+└── README.md         # Project documentation
 ```
 
 ---
 
-## 💻 Installation & Usage
+## ⚙️ How to Run the Project
 
 ### 1️⃣ Clone the Repository
 
-```bash
+```
 git clone https://github.com/your-username/dice-roller.git
 ```
 
@@ -69,26 +79,36 @@ index.html
 
 in any modern web browser.
 
-✅ No additional setup or dependencies are required.
-
 ---
 
 ## 🎮 How It Works
 
-1. Click the **ROLL DICE** button  
-2. Both dice animate to simulate rolling  
-3. Random numbers between **1 and 6** are generated  
-4. Dice faces update to show the rolled values  
-5. The **sum of both dice** is calculated and displayed  
-6. The result is added to the **recent roll history**
+1. Click the **ROLL DICE** button.
+2. Both dice animate with a 3D rolling effect.
+3. Random numbers between **1 and 6** are generated for each die.
+4. The **sum of the dice** is calculated and displayed.
+5. Special animations and messages appear for certain totals.
 
 ---
 
-## 🔮 Future Improvements
+## 📌 Future Improvements
 
-- 🔊 Add dice rolling sound effects  
-- 📊 Add roll statistics or probability tracking  
-- 🎮 Add multiplayer dice game mode  
-- 📱 Improve mobile responsiveness  
+* Add **sound effects for dice rolling**
+* Add **multiplayer dice rolling**
+* Add **statistics and probability charts**
+* Mobile-optimized interactions
+* Dark/Light theme toggle
 
 ---
+
+## 📜 License
+
+This project is open source and free to use for educational purposes.
+
+---
+
+## 👩‍💻 Author
+
+**Hema Kamble**
+
+If you like this project, consider giving it a ⭐ on GitHub!
