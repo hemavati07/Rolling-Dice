@@ -7,19 +7,16 @@ The project features smooth animations, glowing neon UI, roll history tracking, 
 
 ---
 
-## 🚀 Demo
+## 🚀 Live Demo
 
-You can view the project by opening the `index.html` file in any modern web browser.
-
-Or deploy it easily using **GitHub Pages**.
+👉 Try the Dice Roller here:
 
 ---
 
 ## 📸 Screenshot
 
-![Dice Roller Screenshot](screenshot.png)
+![Dice Roller Screenshot](Dice.png)
 
-*(Add your project screenshot in the repository and name it `screenshot.png`)*
 
 ---
 
@@ -45,7 +42,7 @@ Or deploy it easily using **GitHub Pages**.
 
 * **HTML5** – Structure
 * **CSS3** – Styling & Animations
-* **JavaScript (Vanilla)** – Logic & Interactivity
+* **JavaScript** – Logic & Interactivity
 
 ---
 
@@ -61,25 +58,6 @@ dice-roller/
 
 ---
 
-## ⚙️ How to Run the Project
-
-### 1️⃣ Clone the Repository
-
-```
-git clone https://github.com/your-username/dice-roller.git
-```
-
-### 2️⃣ Open the Project
-
-Navigate to the project folder and open:
-
-```
-index.html
-```
-
-in any modern web browser.
-
----
 
 ## 🎮 How It Works
 
@@ -100,15 +78,3 @@ in any modern web browser.
 * Dark/Light theme toggle
 
 ---
-
-## 📜 License
-
-This project is open source and free to use for educational purposes.
-
----
-
-## 👩‍💻 Author
-
-**Hema Kamble**
-
-If you like this project, consider giving it a ⭐ on GitHub!
