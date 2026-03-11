@@ -1,74 +1,61 @@
 # 🎲 3D Dice Roller
 
-A modern **3D Dice Roller web application** built using **HTML, CSS, and JavaScript**.
-This project simulates rolling two dice with smooth animations and automatically calculates the **total of the dice values**.
+A simple and interactive **3D Dice Roller web application** built using **HTML, CSS, and JavaScript**.  
+The application simulates rolling two dice with smooth animations and automatically calculates the **sum of both dice**.
 
-The application features an **interactive UI, animated backgrounds, 3D dice effects, roll history tracking, and special messages for unique dice totals**, making it both visually engaging and functional.
+This project demonstrates front-end development concepts such as **DOM manipulation, random number generation, CSS animations, and interactive UI design**.
 
 ---
 
-# 🚀 Demo
+## 🚀 Demo
 
 You can run the project locally by opening the **index.html** file in your browser.
 
-*(You can also deploy it using GitHub Pages later.)*
+file:///D:/Training%20and%20Upskills/Rolling%20Dice/index.html
+---
+
+## 📸 Screenshot
+
+![Dice Roller Screenshot](Dice.png)
 
 ---
 
-# ✨ Features
+## ✨ Features
 
-* 🎲 **3D Dice Animation** using CSS transforms
-* ➕ **Automatic sum calculation** of both dice
-* 🎉 **Interactive animations** (confetti, ripple effects, dice bounce)
-* 🌌 **Animated background** with floating elements and stars
-* 📜 **Recent roll history tracking**
-* 💬 **Special messages for certain totals**
-
-  * Snake Eyes (2)
-  * Lucky Seven (7)
-  * Eleven
-  * Boxcars (12)
-* ⚡ Smooth UI interactions and responsive design
+- 🎲 Roll two dice with animated effects  
+- ➕ Automatically calculates the **sum of both dice**  
+- 🌌 Interactive and visually appealing **UI design**  
+- 📜 Displays **recent roll history**  
+- 💬 Shows **special messages** for specific dice totals  
+- ⚡ Smooth animations and responsive layout  
 
 ---
 
-# 🛠️ Technologies Used
+## 🛠️ Technologies Used
 
-| Technology     | Purpose                                         |
-| -------------- | ----------------------------------------------- |
-| **HTML5**      | Page structure                                  |
-| **CSS3**       | Styling, layout, animations, and 3D effects     |
-| **JavaScript** | Dice logic, DOM manipulation, and interactivity |
+- **HTML5** – Structure of the web page  
+- **CSS3** – Styling, animations, and 3D effects  
+- **JavaScript (Vanilla JS)** – Dice logic and interactivity  
 
 ---
 
-# 📂 Project Structure
+## 📂 Project Structure
 
 ```
 dice-roller/
 │
-└── index.html   # Main project file containing HTML, CSS, and JavaScript
+├── index.html
+└── images
+    └── screenshot.png
 ```
 
 ---
 
-# ⚙️ How It Works
-
-1. The user clicks the **ROLL DICE** button.
-2. Both dice start a **3D rolling animation**.
-3. JavaScript generates **two random numbers between 1 and 6**.
-4. The dice faces update to display the rolled values.
-5. The **sum of both dice** is calculated and displayed.
-6. The result is added to the **roll history section**.
-7. Special totals trigger **custom messages and effects**.
-
----
-
-# 💻 Installation & Usage
+## 💻 Installation & Usage
 
 ### 1️⃣ Clone the Repository
 
-```
+```bash
 git clone https://github.com/your-username/dice-roller.git
 ```
 
@@ -82,28 +69,26 @@ index.html
 
 in any modern web browser.
 
-No additional setup or dependencies are required.
+✅ No additional setup or dependencies are required.
 
 ---
 
-# 📸 Screenshot
+## 🎮 How It Works
 
-You can add a screenshot of your project UI here.
-
-Example:
-
-```
-/images/project-preview.png
-```
+1. Click the **ROLL DICE** button  
+2. Both dice animate to simulate rolling  
+3. Random numbers between **1 and 6** are generated  
+4. Dice faces update to show the rolled values  
+5. The **sum of both dice** is calculated and displayed  
+6. The result is added to the **recent roll history**
 
 ---
 
-# 🔮 Future Improvements
+## 🔮 Future Improvements
 
-Possible enhancements for the project:
+- 🔊 Add dice rolling sound effects  
+- 📊 Add roll statistics or probability tracking  
+- 🎮 Add multiplayer dice game mode  
+- 📱 Improve mobile responsiveness  
 
-* 🔊 Add **dice rolling sound effects**
-* 📊 Add **dice statistics and probability tracking**
-* 🎮 Add **multiplayer dice game mode**
-* 🎲 Support **multiple dice selection**
-* 📱 Improve **mobile UI responsiveness**
+---
