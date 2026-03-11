@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>3D Dice Roller</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+<style>
+
+/* ─── RESET & BASE ─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark:   #07030f;
+  --bg-mid:    #0d0520;
+  --panel:     rgba(18, 8, 40, 0.85);
+  --border:    rgba(180, 80, 255, 0.25);
+
+  /* neon palette */
+  --neon-purple: #b84fff;
+  --neon-pink:   #ff3cac;
+  --neon-cyan:   #00f5ff;
+  --neon-yellow: #ffe600;
+  --neon-green:  #00ff9d;
+  --neon-orange: #ff7a00;
+
+  /* dice colours */
+  --dice-top:    #ffffff;
+  --dice-front:  #f2e8ff;
+  --dice-right:  #d9c4ff;
+  --dice-left:   #c4a8ff;
+  --dice-bottom: #a888f0;
+  --dice-back:   #b89eff;
+  --dot-color:   #1a006e;
+
+  --sz: 110px;  /* cube size */
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg-dark);
+  font-family: 'Outfit', sans-serif;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* ─── ANIMATED BACKGROUND ──────────────────────── */
+.bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 10% 20%, rgba(120,0,200,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 100% at 90% 80%, rgba(255,40,120,0.25) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,200,255,0.08) 0%, transparent 60%),
+    linear-gradient(160deg, #07030f 0%, #0d0520 50%, #120830 100%);
+}
+
+/* floating orbs */
+.orb {
+  position: fixed; border-radius: 50%; filter: blur(70px);
+  pointer-events: none; animation: orbFloat var(--d) ease-in-out infinite alternate;
+}
+.orb1 { width:500px;height:500px; background:rgba(160,0,255,0.12); top:-150px; left:-150px; --d:9s; }
+.orb2 { width:400px;height:400px; background:rgba(255,30,120,0.10); bottom:-100px; right:-100px; --d:11s; animation-delay:-5s; }
+.orb3 { width:300px;height:300px; background:rgba(0,245,255,0.07); top:40%; left:55%; --d:13s; animation-delay:-3s; }
+
+@keyframes orbFloat {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(50px, 40px) scale(1.15); }
+}
+
+/* grid lines */
+.grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.04;
+  background-image:
+    linear-gradient(rgba(180,80,255,1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,80,255,1) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── LAYOUT ───────────────────────────────────── */
+.stage {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 20px;
+  gap: 0;
+}
+
+/* ─── CARD ─────────────────────────────────────── */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 32px;
+  padding: 52px 60px 56px;
+  width: min(580px, 96vw);
+  text-align: center;
+  position: relative;
+  backdrop-filter: blur(24px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 60px rgba(120,0,200,0.2),
+    0 40px 80px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+/* corner accents */
+.card::before, .card::after {
+  content: '';
+  position: absolute;
+  width: 60px; height: 60px;
+  border-color: var(--neon-purple);
+  border-style: solid;
+  opacity: 0.5;
+}
+.card::before { top: 16px; left: 16px; border-width: 2px 0 0 2px; border-radius: 12px 0 0 0; }
+.card::after  { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; border-radius: 0 0 12px 0; }
+
+/* ─── HEADER ───────────────────────────────────── */
+.tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(184,79,255,0.15);
+  border: 1px solid rgba(184,79,255,0.4);
+  color: var(--neon-purple);
+  font-size: 0.62rem; font-weight: 800; letter-spacing: 0.28em;
+  text-transform: uppercase; padding: 5px 16px; border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 10vw, 4.2rem);
+  line-height: 0.95;
+  letter-spacing: 0.05em;
+  background: linear-gradient(130deg, #fff 0%, #d8b4fe 35%, var(--neon-pink) 70%, var(--neon-orange) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px;
+  text-shadow: none;
+}
+
+.sub {
+  color: rgba(200,180,255,0.45);
+  font-size: 0.88rem; font-weight: 300; letter-spacing: 0.06em;
+  margin-bottom: 44px;
+}
+
+/* ─── DICE AREA ────────────────────────────────── */
+.dice-stage {
+  display: flex;
+  align-items: center; justify-content: center;
+  gap: 48px;
+  margin-bottom: 40px;
+  perspective: 900px;
+}
+
+.die-unit { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+/* The 3-D scene wrapper */
+.cube-scene {
+  width: var(--sz); height: var(--sz);
+  perspective: 500px;
+  cursor: default;
+}
+
+.cube {
+  width: var(--sz); height: var(--sz);
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(-22deg) rotateY(28deg);
+  filter: drop-shadow(0 16px 36px rgba(184,79,255,0.55))
+          drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+  will-change: transform;
+}
+
+/* ── faces ── */
+.face {
+  position: absolute;
+  width: var(--sz); height: var(--sz);
+  border-radius: 18px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  grid-template-rows: repeat(3,1fr);
+  padding: 15px; gap: 5px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.face-front  { background: linear-gradient(145deg, #f5eeff, #dcc8ff); transform: translateZ(calc(var(--sz)/2)); }
+.face-back   { background: linear-gradient(145deg, #b89eff, #9b7fe8); transform: rotateY(180deg) translateZ(calc(var(--sz)/2)); }
+.face-right  { background: linear-gradient(145deg, #d4b8ff, #b89eff); transform: rotateY(90deg)  translateZ(calc(var(--sz)/2)); }
+.face-left   { background: linear-gradient(145deg, #c4a4f8, #a888e8); transform: rotateY(-90deg) translateZ(calc(var(--sz)/2)); }
+.face-top    { background: linear-gradient(145deg, #ffffff, #e8d8ff); transform: rotateX(90deg)  translateZ(calc(var(--sz)/2)); }
+.face-bottom { background: linear-gradient(145deg, #9870d8, #7850b8); transform: rotateX(-90deg) translateZ(calc(var(--sz)/2)); }
+
+/* sheen on visible faces */
+.face-front::after, .face-top::after, .face-right::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.45) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ── dots ── */
+.dot {
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #5b21b6, #1e0060);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.12);
+  transition: opacity 0.1s, transform 0.1s;
+}
+.dot.off { opacity: 0; transform: scale(0.15); }
+
+/* ── roll animation ── */
+@keyframes roll3d {
+  0%   { transform: rotateX(-22deg) rotateY(28deg)   translateY(0)   scale(1);    }
+  18%  { transform: rotateX(220deg) rotateY(190deg)  translateY(-45px) scale(1.1); }
+  40%  { transform: rotateX(490deg) rotateY(400deg)  translateY(-60px) scale(1.15);}
+  62%  { transform: rotateX(720deg) rotateY(590deg)  translateY(-35px) scale(1.07);}
+  80%  { transform: rotateX(860deg) rotateY(700deg)  translateY(-12px) scale(1.02);}
+  100% { transform: rotateX(-22deg) rotateY(28deg)   translateY(0)   scale(1);    }
+}
+.cube.rolling {
+  animation: roll3d 0.72s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+}
+
+/* landing bounce */
+@keyframes land {
+  0%  { transform: rotateX(-22deg) rotateY(28deg) translateY(0)    scale(1); }
+  40% { transform: rotateX(-22deg) rotateY(28deg) translateY(-10px) scale(1.05); }
+  70% { transform: rotateX(-22deg) rotateY(28deg) translateY(3px)  scale(0.98); }
+  100%{ transform: rotateX(-22deg) rotateY(28deg) translateY(0)    scale(1); }
+}
+.cube.landing {
+  animation: land 0.38s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+/* die label */
+.die-label {
+  font-size: 0.65rem; font-weight: 800; letter-spacing: 0.22em;
+  text-transform: uppercase; color: rgba(200,170,255,0.5);
+}
+
+/* separator */
+.vsep {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; color: rgba(184,79,255,0.3);
+  padding-bottom: 28px; user-select: none;
+  text-shadow: 0 0 20px rgba(184,79,255,0.4);
+}
+
+/* ─── RESULT PANEL ─────────────────────────────── */
+.result-panel {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(184,79,255,0.18);
+  border-radius: 18px;
+  padding: 22px 32px;
+  margin-bottom: 32px;
+  min-height: 78px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; flex-wrap: wrap;
+}
+
+.hint {
+  color: rgba(200,170,255,0.28);
+  font-style: italic; font-size: 0.9rem;
+}
+
+.ri {
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; transform: translateY(14px) scale(0.8);
+  transition: opacity 0.4s cubic-bezier(0.34,1.56,0.64,1),
+              transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ri.show { opacity: 1; transform: none; }
+
+.rval {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem; line-height: 1;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(184,79,255,0.5);
+}
+.rlbl {
+  font-size: 0.58rem; font-weight: 800; letter-spacing: 0.22em;
+  text-transform: uppercase; color: rgba(180,140,255,0.45);
+  margin-top: 2px;
+}
+
+.rop {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem; color: rgba(184,79,255,0.3);
+  transition: opacity 0.3s; opacity: 0;
+}
+.rop.show { opacity: 1; }
+
+.ri.total .rval {
+  font-size: 3.5rem;
+  background: linear-gradient(120deg, var(--neon-green), var(--neon-cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  filter: drop-shadow(0 0 14px rgba(0,255,157,0.5));
+}
+
+/* ─── BUTTON ───────────────────────────────────── */
+.roll-btn {
+  position: relative; overflow: hidden;
+  background: linear-gradient(130deg, #9333ea, var(--neon-pink));
+  border: none; border-radius: 16px;
+  color: #fff; font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.3rem; letter-spacing: 0.18em;
+  padding: 18px 64px; cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 8px 32px rgba(180,0,255,0.4),
+    0 2px 8px rgba(0,0,0,0.4);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.roll-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.22) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.2s;
+}
+.roll-btn:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 16px 48px rgba(220,0,255,0.55), 0 4px 12px rgba(0,0,0,0.4); }
+.roll-btn:hover::before { opacity: 1; }
+.roll-btn:active { transform: scale(0.96); }
+.roll-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+/* pulse ring on hover */
+.roll-btn::after {
+  content: '';
+  position: absolute; inset: -3px; border-radius: 19px;
+  border: 2px solid rgba(255,60,172,0.5);
+  opacity: 0; transition: opacity 0.2s;
+}
+.roll-btn:hover::after { opacity: 1; }
+
+/* ripple */
+.rpl {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.28);
+  pointer-events: none;
+  transform: scale(0);
+  animation: rplAnim 0.65s linear forwards;
+}
+@keyframes rplAnim { to { transform: scale(4.5); opacity: 0; } }
+
+/* ─── HISTORY ──────────────────────────────────── */
+.hist-head {
+  font-size: 0.6rem; font-weight: 800; letter-spacing: 0.28em;
+  text-transform: uppercase; color: rgba(180,140,255,0.3);
+  margin-top: 30px; margin-bottom: 10px;
+}
+.history { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 30px; }
+.chip {
+  background: rgba(184,79,255,0.1);
+  border: 1px solid rgba(184,79,255,0.2);
+  border-radius: 20px; padding: 5px 15px;
+  font-size: 0.78rem; color: rgba(210,185,255,0.7);
+  opacity: 0; animation: chipIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+.chip.fresh {
+  background: rgba(0,255,157,0.1);
+  border-color: rgba(0,255,157,0.35);
+  color: #6ee7b7;
+}
+@keyframes chipIn { from { opacity:0; transform:scale(0.5); } to { opacity:1; transform:scale(1); } }
+
+/* ─── CONFETTI PARTICLES ───────────────────────── */
+.confetti {
+  position: fixed; pointer-events: none; border-radius: 2px;
+  animation: confFly var(--dur) ease-out forwards;
+}
+@keyframes confFly {
+  0%   { opacity:1; transform: translate(0,0) rotate(0deg) scale(1); }
+  100% { opacity:0; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0.2); }
+}
+
+/* ─── STAR FIELD ───────────────────────────────── */
+.stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
+.star {
+  position:absolute; border-radius:50%; background:#fff;
+  animation: starPulse var(--sd) ease-in-out infinite alternate;
+  opacity:0;
+}
+@keyframes starPulse {
+  0%   { opacity:0; transform:scale(0.4); }
+  100% { opacity:var(--so); transform:scale(1); }
+}
+
+/* ─── SPECIAL MESSAGE ──────────────────────────── */
+.special-msg {
+  position: fixed; top: 22px; left: 50%; transform: translateX(-50%) translateY(-80px);
+  background: linear-gradient(120deg, #ff3cac, #ffe600);
+  color: #000; font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem; letter-spacing: 0.15em;
+  padding: 10px 28px; border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(255,60,172,0.5);
+  z-index: 100; pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+  opacity: 0;
+}
+.special-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+</style>
+</head>
+<body>
+
+<!-- background layers -->
+<div class="bg"></div>
+<div class="grid"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<div class="stars" id="stars"></div>
+
+<!-- special msg toast -->
+<div class="special-msg" id="toast"></div>
+
+<div class="stage">
+<div class="card">
+
+  <div class="tag">🎲 Board Game · Dice Roller</div>
+  <h1>Roll the<br>Dice</h1>
+  <p class="sub">Two dice &mdash; one destiny</p>
+
+  <!-- ── DICE ── -->
+  <div class="dice-stage">
+
+    <!-- Die 1 -->
+    <div class="die-unit">
+      <div class="cube-scene">
+        <div class="cube" id="cube1">
+          <!-- FRONT face – this is the active face showing the value -->
+          <div class="face face-front" id="face1">
+            <div class="dot off"></div><div class="dot off"></div><div class="dot off"></div>
+            <div class="dot off"></div><div class="dot off"></div><div class="dot off"></div>
+            <div class="dot off"></div><div class="dot off"></div><div class="dot off"></div>
+          </div>
+          <!-- other faces (decorative) -->
+          <div class="face face-back">
+            <div class="dot off" style="grid-column:2;grid-row:2"></div>
+          </div>
+          <div class="face face-right">
+            <div class="dot off" style="grid-column:1;grid-row:1"></div>
+            <div class="dot off" style="grid-column:3;grid-row:3"></div>
+          </div>
+          <div class="face face-left">
+            <div class="dot off" style="grid-column:2;grid-row:1"></div>
+            <div class="dot off" style="grid-column:2;grid-row:2"></div>
+            <div class="dot off" style="grid-column:2;grid-row:3"></div>
+          </div>
+          <div class="face face-top">
+            <div class="dot off" style="grid-column:1;grid-row:1"></div>
+            <div class="dot off" style="grid-column:3;grid-row:1"></div>
+            <div class="dot off" style="grid-column:2;grid-row:2"></div>
+            <div class="dot off" style="grid-column:1;grid-row:3"></div>
+            <div class="dot off" style="grid-column:3;grid-row:3"></div>
+          </div>
+          <div class="face face-bottom">
+            <div class="dot off" style="grid-column:1;grid-row:1"></div>
+            <div class="dot off" style="grid-column:3;grid-row:1"></div>
+            <div class="dot off" style="grid-column:1;grid-row:3"></div>
+            <div class="dot off" style="grid-column:3;grid-row:3"></div>
+            <div class="dot off" style="grid-column:1;grid-row:2"></div>
+            <div class="dot off" style="grid-column:3;grid-row:2"></div>
+          </div>
+        </div>
+      </div>
+      <div class="die-label">Die 1</div>
+    </div>
+
+    <div class="vsep">+</div>
+
+    <!-- Die 2 -->
+    <div class="die-unit">
+      <div class="cube-scene">
+        <div class="cube" id="cube2">
+          <div class="face face-front" id="face2">
+            <div class="dot off"></div><div class="dot off"></div><div class="dot off"></div>
+            <div class="dot off"></div><div class="dot off"></div><div class="dot off"></div>
+            <div class="dot off"></div><div class="dot off"></div><div class="dot off"></div>
+          </div>
+          <div class="face face-back">
+            <div class="dot off" style="grid-column:2;grid-row:2"></div>
+          </div>
+          <div class="face face-right">
+            <div class="dot off" style="grid-column:1;grid-row:1"></div>
+            <div class="dot off" style="grid-column:3;grid-row:3"></div>
+          </div>
+          <div class="face face-left">
+            <div class="dot off" style="grid-column:2;grid-row:1"></div>
+            <div class="dot off" style="grid-column:2;grid-row:2"></div>
+            <div class="dot off" style="grid-column:2;grid-row:3"></div>
+          </div>
+          <div class="face face-top">
+            <div class="dot off" style="grid-column:1;grid-row:1"></div>
+            <div class="dot off" style="grid-column:3;grid-row:1"></div>
+            <div class="dot off" style="grid-column:2;grid-row:2"></div>
+            <div class="dot off" style="grid-column:1;grid-row:3"></div>
+            <div class="dot off" style="grid-column:3;grid-row:3"></div>
+          </div>
+          <div class="face face-bottom">
+            <div class="dot off" style="grid-column:1;grid-row:1"></div>
+            <div class="dot off" style="grid-column:3;grid-row:1"></div>
+            <div class="dot off" style="grid-column:1;grid-row:3"></div>
+            <div class="dot off" style="grid-column:3;grid-row:3"></div>
+            <div class="dot off" style="grid-column:1;grid-row:2"></div>
+            <div class="dot off" style="grid-column:3;grid-row:2"></div>
+          </div>
+        </div>
+      </div>
+      <div class="die-label">Die 2</div>
+    </div>
+
+  </div><!-- /dice-stage -->
+
+  <!-- ── RESULT ── -->
+  <div class="result-panel">
+    <span class="hint" id="hint">Hit roll to begin…</span>
+
+    <div class="ri" id="ri1">
+      <div class="rval" id="rv1">—</div>
+      <div class="rlbl">Die 1</div>
+    </div>
+
+    <div class="rop" id="rplus">+</div>
+
+    <div class="ri" id="ri2">
+      <div class="rval" id="rv2">—</div>
+      <div class="rlbl">Die 2</div>
+    </div>
+
+    <div class="rop" id="req">=</div>
+
+    <div class="ri total" id="rit">
+      <div class="rval" id="rvt">—</div>
+      <div class="rlbl">Total</div>
+    </div>
+  </div>
+
+  <!-- ── BUTTON ── -->
+  <button class="roll-btn" id="rollBtn" onclick="doRoll(event)">
+    🎲 &nbsp;ROLL DICE
+  </button>
+
+  <div class="hist-head">Recent Rolls</div>
+  <div class="history" id="hist"></div>
+
+</div><!-- /card -->
+</div><!-- /stage -->
+
+<script>
+/* ──────────────────────────────────────────────────
+   Star field
+────────────────────────────────────────────────── */
+(function buildStars(){
+  const el = document.getElementById('stars');
+  for(let i=0;i<130;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random()*2.6+0.4;
+    s.style.cssText = `width:${sz}px;height:${sz}px;
+      top:${Math.random()*100}%;left:${Math.random()*100}%;
+      --sd:${1.5+Math.random()*3.5}s;
+      --so:${0.15+Math.random()*0.55};
+      animation-delay:${Math.random()*5}s`;
+    el.appendChild(s);
+  }
+})();
+
+/* ──────────────────────────────────────────────────
+   Dot layout map  (9-cell grid, 0-8 index)
+   0 1 2
+   3 4 5
+   6 7 8
+────────────────────────────────────────────────── */
+const LAYOUT = {
+  1: [4],
+  2: [0,8],
+  3: [0,4,8],
+  4: [0,2,6,8],
+  5: [0,2,4,6,8],
+  6: [0,2,3,5,6,8]
+};
+
+function renderFace(faceEl, val){
+  const dots = faceEl.querySelectorAll('.dot');
+  dots.forEach((d,i) => {
+    const on = LAYOUT[val].includes(i);
+    d.classList.toggle('off', !on);
+  });
+}
+
+/* ──────────────────────────────────────────────────
+   Toast
+────────────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ──────────────────────────────────────────────────
+   Confetti burst
+────────────────────────────────────────────────── */
+function burst(btn){
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+  const cols = ['#b84fff','#ff3cac','#00f5ff','#ffe600','#00ff9d','#ff7a00','#fff'];
+  for(let i=0;i<36;i++){
+    const p = document.createElement('div');
+    p.className = 'confetti';
+    const angle = Math.random()*360;
+    const dist  = 90 + Math.random()*140;
+    const tx = Math.cos(angle*Math.PI/180)*dist;
+    const ty = Math.sin(angle*Math.PI/180)*dist - 60;
+    const rot = (Math.random()*800-400)+'deg';
+    const w = 6+Math.random()*6, h = 6+Math.random()*6;
+    p.style.cssText = `
+      left:${cx}px;top:${cy}px;width:${w}px;height:${h}px;
+      --tx:${tx}px;--ty:${ty}px;--rot:${rot};
+      --dur:${0.65+Math.random()*0.55}s;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      border-radius:${Math.random()>.45?'50%':'3px'};
+      animation-delay:${Math.random()*0.12}s;
+    `;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 1400);
+  }
+}
+
+/* ──────────────────────────────────────────────────
+   Ripple
+────────────────────────────────────────────────── */
+function addRipple(btn, e){
+  const rpl = document.createElement('span');
+  rpl.className = 'rpl';
+  const rect = btn.getBoundingClientRect();
+  const sz = Math.max(rect.width, rect.height)*2;
+  rpl.style.cssText = `width:${sz}px;height:${sz}px;
+    left:${e.clientX-rect.left-sz/2}px;
+    top:${e.clientY-rect.top-sz/2}px`;
+  btn.appendChild(rpl);
+  setTimeout(()=>rpl.remove(), 750);
+}
+
+/* ──────────────────────────────────────────────────
+   Roll history
+────────────────────────────────────────────────── */
+let rolls = [];
+function pushHistory(v1,v2,tot){
+  rolls.unshift({v1,v2,tot});
+  if(rolls.length>7) rolls.pop();
+  const el = document.getElementById('hist');
+  el.innerHTML = '';
+  rolls.forEach((r,i)=>{
+    const c = document.createElement('div');
+    c.className = 'chip'+(i===0?' fresh':'');
+    c.textContent = `${r.v1} + ${r.v2} = ${r.tot}`;
+    c.style.animationDelay = (i*0.055)+'s';
+    el.appendChild(c);
+  });
+}
+
+/* ──────────────────────────────────────────────────
+   Special messages
+────────────────────────────────────────────────── */
+const MSGS = {
+  2:  '🐍 Snake Eyes!',
+  7:  '🎯 Lucky Seven!',
+  11: '🔥 Eleven — So Hot!',
+  12: '👑 Boxcars — Maximum!',
+};
+
+/* ──────────────────────────────────────────────────
+   Main roll logic
+────────────────────────────────────────────────── */
+let rolling = false;
+
+function doRoll(e){
+  if(rolling) return;
+  rolling = true;
+
+  const btn = document.getElementById('rollBtn');
+  btn.disabled = true;
+  addRipple(btn, e);
+  burst(btn);
+
+  // hide results
+  ['ri1','ri2','rit'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  ['rplus','req'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  document.getElementById('hint').style.display='';
+
+  const c1 = document.getElementById('cube1');
+  const c2 = document.getElementById('cube2');
+
+  // kick off roll anim
+  c1.classList.remove('landing');
+  c2.classList.remove('landing');
+  void c1.offsetWidth; void c2.offsetWidth; // reflow
+  c1.classList.add('rolling');
+  c2.classList.add('rolling');
+
+  // flicker random faces
+  let tick = 0;
+  const iv = setInterval(()=>{
+    renderFace(document.getElementById('face1'), Math.ceil(Math.random()*6));
+    renderFace(document.getElementById('face2'), Math.ceil(Math.random()*6));
+    tick++;
+  }, 58);
+  setTimeout(()=>{
+    clearInterval(iv);
+    c1.classList.remove('rolling');
+    c2.classList.remove('rolling');
+
+    const v1 = Math.ceil(Math.random()*6);
+    const v2 = Math.ceil(Math.random()*6);
+    const tot = v1+v2;
+
+    // show final faces
+    renderFace(document.getElementById('face1'), v1);
+    renderFace(document.getElementById('face2'), v2);
+
+    // landing bounce
+    void c1.offsetWidth; void c2.offsetWidth;
+    c1.classList.add('landing');
+    c2.classList.add('landing');
+
+    // reveal result
+    document.getElementById('hint').style.display='none';
+    document.getElementById('rv1').textContent = v1;
+    document.getElementById('rv2').textContent = v2;
+    document.getElementById('rvt').textContent = tot;
+
+    setTimeout(()=>document.getElementById('ri1').classList.add('show'), 80);
+    setTimeout(()=>{ document.getElementById('rplus').classList.add('show'); document.getElementById('ri2').classList.add('show'); }, 240);
+    setTimeout(()=>{ document.getElementById('req').classList.add('show'); document.getElementById('rit').classList.add('show'); }, 420);
+
+    pushHistory(v1, v2, tot);
+
+    if(MSGS[tot]) setTimeout(()=>showToast(MSGS[tot]), 500);
+
+    rolling = false;
+    btn.disabled = false;
+  }, 750);
+}
+
+/* init face with value 1 */
+renderFace(document.getElementById('face1'), 1);
+renderFace(document.getElementById('face2'), 1);
+</script>
+</body>
+</html>
